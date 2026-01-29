@@ -1,0 +1,3 @@
+[submodule "apps/macos-client"]
+	path = apps/macos-client
+	url = https://github.com/praveendas-pv/smart-dashboard-client.git
