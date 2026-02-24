@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.models.item import Item as ItemModel
-from app.schemas.item import Item as ItemSchema, ItemUpdate
+from app.schemas.item import Item as ItemSchema, ItemCreate, ItemUpdate
 
 router = APIRouter(prefix="/items", tags=["items"])
 
@@ -12,6 +12,16 @@ router = APIRouter(prefix="/items", tags=["items"])
 async def get_items(db: Session = Depends(get_db)):
     """Get all items from the database"""
     return db.query(ItemModel).all()
+
+
+@router.post("", response_model=ItemSchema, status_code=201)
+async def create_item(item: ItemCreate, db: Session = Depends(get_db)):
+    """Create a new item"""
+    db_item = ItemModel(**item.model_dump())
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
 
 
 @router.get("/{item_id}", response_model=ItemSchema)
