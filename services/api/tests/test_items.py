@@ -65,3 +65,25 @@ def test_delete_item_not_found(client):
     """Test DELETE /items/{id} returns 404 for non-existent item"""
     response = client.delete("/items/999")
     assert response.status_code == 404
+
+
+def test_update_item(client, db_session):
+    """Test PATCH /items/{id} updates an item with partial fields"""
+    item = Item(name="Original", description="Original desc", price=10.00)
+    db_session.add(item)
+    db_session.commit()
+    db_session.refresh(item)
+
+    response = client.patch(f"/items/{item.id}", json={"name": "Updated", "price": 25.50})
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["name"] == "Updated"
+    assert data["description"] == "Original desc"
+    assert data["price"] == 25.50
+
+
+def test_update_item_not_found(client):
+    """Test PATCH /items/{id} returns 404 for non-existent item"""
+    response = client.patch("/items/999", json={"name": "Nope"})
+    assert response.status_code == 404

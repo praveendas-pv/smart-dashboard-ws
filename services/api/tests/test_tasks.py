@@ -76,3 +76,25 @@ def test_delete_task_not_found(client):
     """Test DELETE /tasks/{id} returns 404 for non-existent task"""
     response = client.delete("/tasks/999")
     assert response.status_code == 404
+
+
+def test_update_task(client, db_session):
+    """Test PATCH /tasks/{id} updates a task with partial fields"""
+    task = Task(title="Original", description="Original desc")
+    db_session.add(task)
+    db_session.commit()
+    db_session.refresh(task)
+
+    response = client.patch(f"/tasks/{task.id}", json={"title": "Updated", "completed": True})
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["title"] == "Updated"
+    assert data["description"] == "Original desc"
+    assert data["completed"] is True
+
+
+def test_update_task_not_found(client):
+    """Test PATCH /tasks/{id} returns 404 for non-existent task"""
+    response = client.patch("/tasks/999", json={"title": "Nope"})
+    assert response.status_code == 404

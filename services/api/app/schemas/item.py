@@ -11,6 +11,12 @@ class ItemCreate(ItemBase):
     pass
 
 
+class ItemUpdate(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    price: float | None = None
+
+
 class Item(ItemBase):
     id: int
 

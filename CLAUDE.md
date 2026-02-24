@@ -52,9 +52,11 @@ Base URL: `http://localhost:8000`
 | `/health` | GET | `{"status": "healthy"}` |
 | `/items` | GET | `[Item]` |
 | `/items/{id}` | GET | `Item` or 404 |
+| `/items/{id}` | PATCH | Updated `Item` or 404 |
 | `/items/{id}` | DELETE | 204 or 404 |
 | `/tasks` | GET | `[Task]` |
 | `/tasks/{id}` | GET | `Task` or 404 |
+| `/tasks/{id}` | PATCH | Updated `Task` or 404 |
 | `/tasks/{id}` | DELETE | 204 or 404 |
 | `/docs` | GET | Swagger UI |
 
