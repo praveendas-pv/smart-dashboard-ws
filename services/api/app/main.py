@@ -1,14 +1,13 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.db import Base, engine, get_db
 from app.models.item import Item as ItemModel
 from app.models.task import Task as TaskModel
-from app.schemas.item import Item as ItemSchema
-from app.routers import tasks
+from app.routers import items, tasks
 
 
 def seed_database(db: Session):
@@ -51,6 +50,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(items.router)
 app.include_router(tasks.router)
 
 
@@ -63,17 +63,3 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
-
-@app.get("/items", response_model=list[ItemSchema])
-async def get_items(db: Session = Depends(get_db)):
-    """Get all items from the database"""
-    return db.query(ItemModel).all()
-
-
-@app.get("/items/{item_id}", response_model=ItemSchema)
-async def get_item(item_id: int, db: Session = Depends(get_db)):
-    """Get a specific item by ID"""
-    item = db.query(ItemModel).filter(ItemModel.id == item_id).first()
-    if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return item

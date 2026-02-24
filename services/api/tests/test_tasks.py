@@ -55,3 +55,24 @@ def test_task_response_fields(client, db_session):
     assert "completed" in task_data
     assert "created_at" in task_data
     assert "updated_at" in task_data
+
+
+def test_delete_task(client, db_session):
+    """Test DELETE /tasks/{id} removes a task"""
+    task = Task(title="To Delete", description="Will be deleted")
+    db_session.add(task)
+    db_session.commit()
+    db_session.refresh(task)
+
+    response = client.delete(f"/tasks/{task.id}")
+    assert response.status_code == 204
+
+    # Verify it's gone
+    response = client.get(f"/tasks/{task.id}")
+    assert response.status_code == 404
+
+
+def test_delete_task_not_found(client):
+    """Test DELETE /tasks/{id} returns 404 for non-existent task"""
+    response = client.delete("/tasks/999")
+    assert response.status_code == 404
